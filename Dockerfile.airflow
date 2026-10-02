@@ -1,0 +1,9 @@
+
+# syntax=docker/dockerfile:1
+FROM apache/airflow:2.9.3-python3.11
+
+# بنثبّت نفس مكتبات المشروع (pandas, xgboost, scikit-learn...) جوه
+# image الـ Airflow نفسه، عشان الـ DAG يقدر يستورد src.data.pipeline
+# مباشرة من غير أي مشاكل مكتبات ناقصة
+COPY requirements.txt /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt

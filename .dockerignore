@@ -1,0 +1,21 @@
+# البيئة الافتراضية — خاصة بويندوز، مش لازمة جوه Linux container
+# (المكتبات بتتثبت من جديد جوه الـ image عن طريق requirements.txt)
+.venv/
+venv/
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+
+# ملفات Git ومحرر الأكواد
+.git/
+.gitignore
+.vscode/
+
+# بيانات كبيرة الحجم — بتوصل للـ container عن طريق volumes في
+# docker-compose.yaml، مش عن طريق نسخها جوه الـ image نفسه
+data/raw/
+data/processed/
+
+# لو موجود، ملف secrets محلي
+.env

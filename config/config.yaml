@@ -1,0 +1,12 @@
+# config/config.yaml
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  raw_filename: "Customer-Churn-Records.csv"
+  processed_filename: "customer_churn_clean.parquet"
+
+bigquery:
+  project_id: "churn-prediction-etl-pipeline"      # هتحطه لما نوصل لخطوة BigQuery
+  dataset: "churn_analytics"
+  table: "customers_clean"

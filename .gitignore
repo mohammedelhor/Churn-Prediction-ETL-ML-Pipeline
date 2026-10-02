@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+dist/
+*.egg-info/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data files (مهم جدًا لمشاريع ETL/ML)
+data/raw/
+data/processed/
+*.csv
+*.parquet
+*.json
+!requirements.json
+*.xlsx
+*.sqlite
+*.db
+
+# ML Models (مش بترفع، بتتدرب تاني)
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+models/
+saved_models/
+
+# Logs
+*.log
+logs/
+
+# Environment variables (مهم جدًا - فيه API keys)
+.env
+.env.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Airflow (لو بتستخدمه)
+airflow.cfg
+airflow.db
