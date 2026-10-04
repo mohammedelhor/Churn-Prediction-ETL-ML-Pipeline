@@ -27,14 +27,11 @@ data/processed/
 *.sqlite
 *.db
 
-# ML Models (مش بترفع، بتتدرب تاني)
+# ML Model Artifacts
 *.pkl
-*.joblib
 *.h5
 *.pt
 *.pth
-models/
-saved_models/
 
 # Logs
 *.log
@@ -50,10 +47,5 @@ logs/
 .idea/
 *.swp
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Airflow (لو بتستخدمه)
-airflow.cfg
-airflow.db
+# joblib
+*churn_model.joblib        ← ignored
