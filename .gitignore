@@ -1,51 +1,15 @@
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
+*.pyc
 .venv/
-ENV/
-build/
-dist/
-*.egg-info/
-
-# Jupyter Notebook
-.ipynb_checkpoints/
-*.ipynb_checkpoints
-
-# Data files (مهم جدًا لمشاريع ETL/ML)
+venv/
+.env
+.vscode/
 data/raw/
 data/processed/
-*.csv
-*.parquet
-*.json
-!requirements.json
-*.xlsx
-*.sqlite
-*.db
-
-# ML Model Artifacts
+*.joblib
 *.pkl
-*.h5
-*.pt
-*.pth
-
-# Logs
-*.log
+# Airflow runtime files
+airflow.db
 logs/
-
-# Environment variables (مهم جدًا - فيه API keys)
-.env
-.env.local
-*.env
-
-# IDE
-.vscode/
-.idea/
-*.swp
-
-# joblib
-*churn_model.joblib        ← ignored
+standalone_admin_password.txt
+webserver_config.py

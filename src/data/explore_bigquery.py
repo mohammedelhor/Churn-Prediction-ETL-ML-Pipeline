@@ -8,7 +8,7 @@ src/data/explore_bigquery.py
 """
 
 from google.cloud import bigquery
-from paths import load_config
+from src.data.paths import load_config
 
 
 def get_bq_client_and_table(config: dict):

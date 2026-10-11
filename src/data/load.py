@@ -1,81 +1,3 @@
-# import pandas as pd
-# import yaml
-# import logging
-# from pathlib import Path
-
-
-# logger = logging.getLogger(__name__)
-
-# PROJECT_ROOT = Path(__file__).resolve().parents[2]
-# CONFIG_PATH  = PROJECT_ROOT / "config" / "config.yaml"
-
-# def load_config(config_path: Path = CONFIG_PATH) -> dict :
-#     with open(config_path, "r", encoding="utf-8") as f : 
-#         return yaml.safe_load(f)
-
-# # ___________________________________________________
-# # Parquet loader
-# # _____________________________________________________
-    
-
-# def load_to_parquet(df: pd.DataFrame, path: Path | None = None) -> Path:
-#     if path is None:
-#        config = load_config
-#        processed_dir = PROJECT_ROOT / config ["data"]["processed_filename"]
-#        path = processed_dir / config["data"]["processed_filename"]
-#     else:
-#        path = Path(path) 
-
-#     df.to_parquet(path, engine ="pyarrow", index = False, compression = "snappy")       
-#     size_kb = path.stat().st_size / 1024
-#     logger.info(f"Wrote parquet: {path} ({size_kb: .1f} KB)")
-
-#     return path
-
-# #__BIGQUERY LOADER_________
-
-# def load_to_bigquery(parquet_path: Path, config_path: Path = CONFIG_PATH) -> None:
-#     from google.cloud import bigquery
-#     config = load_config(config_path)
-#     bq_config = config["bigquery"]
-
-#     project_id = bq_config["churn-prediction-etl-pipeline"]
-#     dataset = bq_config["dataset"]
-#     table = bq_config["table"]
-
-#     if not project_id:
-#         raise ValueError("bigquery.churn-prediction-etl-pipeline, config.yaml")
-#     client = bigquery.Client(project=project_id)
-#     table_id = f"{churn-prediction-etl-pipeline}.{dataset}.{table}"
-
-#     job_config = bigquery.LoadJobConfig(
-#         source_format=bigquery.SourceFormat.PARQUET,
-#         write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
-#     )
-
-#     with open(parquet_path, "rb") as f :
-#         job = client.load_table_from_file(f, table_id, job_config=job_config)
-#     job.result()
-
-#     table_ref = client.get_table(table_id)
-#     logger.info(f"Loaded {table_ref.num_rows} rows into {table_id}")
-
-
-# #___ Manual Test Block ____________________
-
-# if __name__ == "__main__" :
-#     logging.basicConfig(level=logging.INFO)
-
-#     from extract import extract
-#     from transform import clean
-
-#     raw_df = extract()
-#     clean_df = clean(raw_df)
-#     parquet_path = load_to_parquet(clean_df)
-
-#     print(f"Saved to: {parquet_path}")
-
-
 """
 src/data/load.py
 =================
@@ -92,7 +14,7 @@ from pathlib import Path
 import logging
 import pandas as pd
 
-from paths import PROJECT_ROOT, load_config, CONFIG_PATH
+from src.data.paths import PROJECT_ROOT, load_config, CONFIG_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -185,8 +107,8 @@ def load_to_bigquery(parquet_path: Path, config_path: Path = CONFIG_PATH) -> Non
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    from extract import extract
-    from transform import clean
+    from src.data.extract import extract
+    from src.data.transform import clean
 
     raw_df = extract()
     clean_df = clean(raw_df)
@@ -195,4 +117,3 @@ if __name__ == "__main__":
     print(f"Saved to: {parquet_path}")
 
     # load_to_bigquery(parquet_path)  # فعّلها لما تجهز الـ credentials
-

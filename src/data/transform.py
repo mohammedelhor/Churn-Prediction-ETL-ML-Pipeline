@@ -169,12 +169,10 @@ if __name__ == "__main__":
 
     # استيراد extract من نفس المجلد، عشان نقدر نختبر transform.py لوحده
     # بسلسلة extract -> clean كاملة، من غير ما نحتاج pipeline.py لسه
-    from extract import extract
+    from src.data.extract import extract
 
     raw_df = extract()
     clean_df = clean(raw_df)
 
     print(clean_df.head())
     print(f"Shape before: {raw_df.shape} | after: {clean_df.shape}")
-
-

@@ -1,56 +1,3 @@
-# import pandas as pd
-
-# def validate_data(df: pd.DataFrame):
-#     error = []
-
-#     # 1. check if empty
-#     if df.empty:
-#        errors.append("Dataset is empty")
-
-#     # 2. check missing values
-#     missing = df.isnull().sum().sum()
-#     print(f"Total missing values: {missing}")
-#     print(df.isnull().sum())
-
-#     # 3. check duplicates
-#     duplicates = df.duplicates().sum()
-#     print(f"Total duplicates: {duplicates}")
-
-#     if duplicates > 0:
-#         print(f"warning: {duplicates} duplicates rows found")
-
-#     # 4. Basic schema check (example)
-#     expected_columns = [
-#         "Age"
-#         "customer_id"
-#         "surname"
-#         "credit_score"
-#         "geography"
-#         "gender"
-#         "tenure"
-#         "balance"
-#         "num_of_products"
-#         "has_cr_card"
-#         "is_active_member"
-#         "estimated_salary"
-#         "exited"
-#         "complain"
-#         "satisfaction_score"
-#         "card_type"
-#         "point_earned"
-#     ]
-
-#     for col in expected_columns : 
-#         if col not in df.columns:
-#            errors.append(f"Missing column: {col}")
-#     if errors:
-#         raise ValueError(f"Data validation failed: {errors}")
-#     if not pd.api.types.is_numeric_dtype(df["age"]):
-#         errors.append("Column age must be numeric")
-
-#     print(" Data validation passed")
-#     return True       
-
 """
 src/data/validate.py
 =====================
@@ -179,8 +126,8 @@ def validate(df: pd.DataFrame) -> None:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    from extract import extract
-    from transform import clean
+    from src.data.extract import extract
+    from src.data.transform import clean
 
     raw_df = extract()
     clean_df = clean(raw_df)
