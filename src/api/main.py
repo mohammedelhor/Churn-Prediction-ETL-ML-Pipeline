@@ -16,12 +16,12 @@ from src.api.schemas import CustomerInput, PredictionOutput
 
 # القرار المعتمد من evaluate.py — أفضل توازن Recall/Precision لهدف
 # المشروع (اكتشاف أكبر عدد ممكن من العملاء المهددين بالمغادرة)
-DECISION_THRESHOLD = 0.40
+DECISION_THRESHOLD = 0.24
 
 app = FastAPI(title="Churn Prediction API")
 
 # الموديل وقايمة الأعمدة بيتحمّلوا مرة واحدة بس وقت بدء تشغيل السيرفر
-# (startup) — مش مع كل طلب. تحميل موديل من القرص عملية بطيئة نسبيًا،
+# (startup) — مش مع كل طلب. تحميل موديل من القرص عملية بطيئة نسبيًا，
 # وتكرارها مع كل request هيبوّظ سرعة الـ API بالكامل
 _model = None
 _feature_columns = None
@@ -31,7 +31,7 @@ _feature_columns = None
 def load_artifacts():
     global _model, _feature_columns
 
-    model_path = PROJECT_ROOT / "joblib" / "churn_model_xgboost.joblib"
+    model_path = PROJECT_ROOT / "joblib" / "churn_model.joblib"
     _model = joblib.load(model_path)
 
     with open(get_feature_columns_path(), encoding="utf-8") as f:
