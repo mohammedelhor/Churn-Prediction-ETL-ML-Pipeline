@@ -1,0 +1,51 @@
+{
+  "target_recall": 0.75,
+  "n_splits": 5,
+  "pooled_oof_choice": {
+    "0.75": {
+      "threshold": 0.22,
+      "recall": 0.7539877300613497,
+      "precision": 0.5070132013201321
+    },
+    "0.70": {
+      "threshold": 0.25,
+      "recall": 0.7042944785276074,
+      "precision": 0.5433033601514434
+    },
+    "0.80": {
+      "threshold": 0.18,
+      "recall": 0.8,
+      "precision": 0.44872677219545765
+    }
+  },
+  "per_fold_thresholds": {
+    "values": [
+      0.22,
+      0.215,
+      0.235,
+      0.22,
+      0.21
+    ],
+    "mean": 0.21999999999999997,
+    "std": 0.00935414346693485,
+    "min": 0.21,
+    "max": 0.235
+  },
+  "test_at_cv_threshold": {
+    "threshold": 0.22,
+    "recall": 0.7745098039215687,
+    "precision": 0.507223113964687,
+    "flagged": 623,
+    "false_alarms": 307,
+    "missed_churners": 92
+  },
+  "test_at_current_threshold": {
+    "threshold": 0.24,
+    "recall": 0.75,
+    "precision": 0.5387323943661971,
+    "flagged": 568,
+    "false_alarms": 262,
+    "missed_churners": 102
+  },
+  "test_positives": 408
+}

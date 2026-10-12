@@ -16,7 +16,7 @@ from src.api.schemas import CustomerInput, PredictionOutput
 
 # القرار المعتمد من evaluate.py — أفضل توازن Recall/Precision لهدف
 # المشروع (اكتشاف أكبر عدد ممكن من العملاء المهددين بالمغادرة)
-DECISION_THRESHOLD = 0.24
+DECISION_THRESHOLD = 0.22
 
 app = FastAPI(title="Churn Prediction API")
 

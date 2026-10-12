@@ -18,7 +18,7 @@ Built by **AURA Labs**.
 | Load | Writes Parquet locally and (optionally) loads to BigQuery | `src/data/load.py` |
 | Explore | SQL analysis with DuckDB (local) and BigQuery (cloud) | `src/data/explore_sql.py`, `explore_bigquery.py` |
 | Features | One-hot encoding + engineered features, saves the exact column list used for training | `src/features/build_features.py` |
-| Models | Random Forest, XGBoost, Logistic Regression, threshold analysis, hyper-parameter search | `src/models/` |
+| Models | Random Forest, XGBoost, Logistic Regression, model comparison, cross-validated threshold, hyper-parameter search | `src/models/` |
 | API | FastAPI service that returns a churn probability and a decision | `src/api/` |
 | Orchestration | Airflow DAG that runs the ETL daily | `dags/churn_pipeline_dag.py` |
 
@@ -31,7 +31,7 @@ Built by **AURA Labs**.
 - **Class imbalance (about 20% churn) is handled in the model**, not by resampling: `class_weight="balanced"` for Random Forest and Logistic Regression, and `scale_pos_weight` computed from the data (about 3.9) for XGBoost.
 - **Accuracy is not the main metric.** With 80/20 classes, accuracy is misleading. I use ROC-AUC (threshold-independent), plus recall, precision and the confusion matrix at a chosen threshold.
 - **Models are compared at the same recall, not at the same threshold.** Each model spreads its probabilities differently, so one threshold favours some models unfairly. Fixing the share of churners to catch and counting the false alarms each model needs is the fair comparison (see Results).
-- **The API serves Random Forest at a threshold of 0.24.** At the same recall it raises fewer false alarms than XGBoost (about 251 vs 296 at 75% recall on the test set). Missing a customer who is about to leave costs more than a false alarm, so the threshold is set far below 0.50: it catches about 75% of churners with about 55% precision.
+- **The API serves Random Forest at a threshold of 0.22.** At the same recall it raises fewer false alarms than XGBoost (about 251 vs 296 at 75% recall on the test set). Missing a customer who is about to leave costs more than a false alarm, so the threshold is set far below 0.50. It was chosen by 5-fold cross-validation on the training set only (rule: the highest precision that still catches 75% of churners), so the test set was not used to tune it. On the test set it catches 77.5% of churners with 50.7% precision.
 - **No training-serving skew, and a test that proves it.** The exact feature columns used in training are saved to `feature_columns.json`, and the API builds the one-hot columns by hand to match them. `tests/test_serving_consistency.py` checks that the API path gives the same probability as the training matrix for 200 random customers. (It caught a real bug: `get_dummies(drop_first=True)` on a single row silently erased the country, gender and card type.)
 - **Unknown categories are rejected.** The request schema only accepts the countries, genders and card types seen in training, so a typo returns a clear 422 instead of a silent wrong prediction.
 - **Absolute imports (`from src.data.x import y`).** This lets the same code run as a script, from Docker, and from Airflow.
@@ -58,7 +58,24 @@ How to read it: ROC-AUC measures how well a model ranks customers and does not d
 | 75% | **251** | 296 | 513 |
 | 80% | **379** | 392 | 595 |
 
-Random Forest needs the fewest false alarms at every target, with a clear gap at 70-75% and a small one at 80%. The threshold was picked on this same test set, so the numbers are slightly optimistic; choosing it with cross-validation is a next step.
+Random Forest needs the fewest false alarms at every target, with a clear gap at 70-75% and a small one at 80%.
+
+**Choosing the threshold without the test set** (`python -m src.models.cv_threshold`, raw numbers in `reports/threshold_cv.json`). Out-of-fold probabilities from 5-fold cross-validation on the training data pick the threshold; it is then applied once to the test set.
+
+| Target recall | Threshold (CV) | CV recall | CV precision |
+|---|---|---|---|
+| 70% | 0.250 | 70.4% | 54.3% |
+| **75%** | **0.220** | 75.4% | 50.7% |
+| 80% | 0.180 | 80.0% | 44.9% |
+
+The 75% rule picked 0.220 on the pooled data and between 0.210 and 0.235 on the individual folds (standard deviation 0.009), so the choice is stable. Applied once to the test set (408 churners):
+
+| Threshold | Recall | Precision | Flagged | False alarms | Missed |
+|---|---|---|---|---|---|
+| 0.22 (served) | 77.5% | 50.7% | 623 | 307 | 92 |
+| 0.24 (picked earlier on the test set) | 75.0% | 53.9% | 568 | 262 | 102 |
+
+The cross-validation estimate (75.4% recall, 50.7% precision) is close to the test result (77.5%, 50.7%), so the numbers are not inflated by tuning on the test set. Going from 0.24 to 0.22 catches 10 more churners for 45 more false alarms; since a lost customer costs more than an extra retention call, 0.22 is served.
 
 ---
 
@@ -150,6 +167,8 @@ python -m src.data.explore_bigquery   # BigQuery (requires step 4)
 python -m src.features.build_features
 python -m src.models.train
 python -m src.models.evaluate
+python -m src.models.compare         # all models at the same recall
+python -m src.models.cv_threshold    # pick the threshold by cross-validation
 python -m src.models.tune             # optional: Random Forest hyper-parameter search
 ```
 
@@ -236,8 +255,8 @@ Python · pandas · PyArrow / Parquet · DuckDB · Google BigQuery · scikit-lea
 
 ## Possible next steps
 
-- Pick the decision threshold with cross-validation instead of the test set
 - Hyper-parameter tuning for the served model (for example with Optuna)
+- Re-run the model comparison itself with cross-validation (it still uses the test set)
 - Write pipeline logs and validation reports to files
 - Pass BigQuery credentials to containers through secrets
 - Run the serving-consistency test in CI with a small fixture model
