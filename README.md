@@ -1,5 +1,7 @@
 # Churn Prediction ETL & ML Pipeline
 
+[![tests](https://github.com/mohammedelhor/Churn-Prediction-ETL-ML-Pipeline/actions/workflows/tests.yml/badge.svg)](https://github.com/mohammedelhor/Churn-Prediction-ETL-ML-Pipeline/actions/workflows/tests.yml)
+
 An end-to-end data engineering and machine learning project that predicts which bank customers are likely to leave (churn). It covers the whole path: raw CSV → cleaning and validation → Parquet + BigQuery → SQL exploration → feature engineering → model training and tuning → a prediction API → Docker → scheduled orchestration with Airflow.
 
 Built by **AURA Labs**.
@@ -72,6 +74,8 @@ Random Forest needs the fewest false alarms at every target, with a clear gap at
 │   ├── raw/                     # put the Kaggle CSV here (not in git)
 │   └── processed/               # generated Parquet files (not in git)
 ├── joblib/                      # trained models + feature_columns.json (not in git)
+├── tests/                       # pytest: validate, transform, serving consistency
+├── .github/workflows/tests.yml  # CI: runs the tests on every push
 ├── src/
 │   ├── data/                    # extract, transform, validate, load, pipeline, explore_*
 │   ├── features/                # build_features
@@ -83,7 +87,7 @@ Random Forest needs the fewest false alarms at every target, with a clear gap at
 └── requirements.txt
 ```
 
-Every folder under `src/` needs an `__init__.py` so that `python -m src....` works.
+Every folder under `src/` has an `__init__.py`, which marks it as a package and keeps imports like `from src.data.x import y` working the same way everywhere.
 
 ---
 
@@ -162,6 +166,21 @@ uvicorn src.api.main:app --reload
 
 ---
 
+## Tests
+
+```bash
+pip install pytest
+python -m pytest tests -v
+```
+
+- `test_validate.py`: the quality gate accepts clean data and rejects missing columns, nulls, duplicate IDs, unknown categories and an implausible churn rate.
+- `test_transform.py`: column renaming, de-duplication, null filling, dtypes, whitespace stripping; out-of-range rows are logged, not dropped.
+- `test_serving_consistency.py`: the API path gives the same probability as the training matrix for 200 random customers. It needs the processed data and trained models, so it is skipped when they are missing (for example in CI).
+
+GitHub Actions runs the suite on every push to `main` (badge at the top).
+
+---
+
 ## Docker
 
 ```bash
@@ -219,10 +238,9 @@ Python · pandas · PyArrow / Parquet · DuckDB · Google BigQuery · scikit-lea
 
 - Pick the decision threshold with cross-validation instead of the test set
 - Hyper-parameter tuning for the served model (for example with Optuna)
-- Unit tests for the transform and validate steps
 - Write pipeline logs and validation reports to files
 - Pass BigQuery credentials to containers through secrets
-- CI with GitHub Actions
+- Run the serving-consistency test in CI with a small fixture model
 
 ---
 
