@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────────────────
+# CI = Continuous Integration
+# كل مرة تعمل push (أو يتفتح pull request) على main، GitHub بيشغّل جهاز
+# Linux جديد وفاضي، ينزّل الكود، يثبّت المكتبات، ويشغّل الاختبارات.
+# النتيجة: علامة ✅ أو ❌ جنب كل commit على صفحة الـ repo.
+# ─────────────────────────────────────────────────────────────────────────
+name: tests
+
+# متى يشتغل؟
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pytest:
+    # الجهاز اللي هيشغّل الاختبارات: Ubuntu جديد في كل مرة
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) ينزّل كود الـ repo على الجهاز
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      # 2) يثبّت نفس نسخة بايثون اللي بتشتغل بيها محليًا (3.11)
+      #    cache: pip = يحفظ المكتبات المنزّلة، فالمرات الجاية أسرع
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # 3) يثبّت مكتبات المشروع + pytest (pytest مش في requirements.txt
+      #    لأنه أداة تطوير مش جزء من الـ API أو الـ ETL)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      # 4) يشغّل كل الاختبارات. python -m pytest (مش pytest وحدها) عشان
+      #    يضيف جذر المشروع لمسار الاستيراد ويشتغل import src.data...
+      #    ملاحظة: ملفات parquet وjoblib مش في git، فاختبارات
+      #    test_serving_consistency هتتخطّى (skipped) هنا — ده متوقع.
+      - name: Run tests
+        run: python -m pytest tests -v
