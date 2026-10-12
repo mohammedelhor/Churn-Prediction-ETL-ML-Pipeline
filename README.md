@@ -103,10 +103,10 @@ pip install -r requirements.txt
 Run everything from the project root with `-m`:
 
 ```bash
-python -m src. data pipeline
+python -m src.data.pipeline
 ```
 
-This extracts, cleans, validates, and writes `data/processed/customer_churn_clean.parquet`.
+This extracts, cleans, validates and writes `data/processed/customer_churn_clean.parquet`.
 
 ### 4. (Optional) Load to BigQuery
 
@@ -122,16 +122,16 @@ If `project_id` is empty, the BigQuery step is skipped.
 ### 5. Explore with SQL
 
 ```bash
-python -m src. data.explore_sql        # DuckDB on the Parquet file
-python -m src. data.explore_bigquery   # BigQuery (requires step 4)
+python -m src.data.explore_sql        # DuckDB on the Parquet file
+python -m src.data.explore_bigquery   # BigQuery (requires step 4)
 ```
 
 ### 6. Build features and train
 
 ```bash
 python -m src.features.build_features
-python -m src. models. train
-python -m src. models. evaluate
+python -m src.models.train
+python -m src.models.evaluate
 python -m src.models.tune             # optional: Random Forest hyper-parameter search
 ```
 
@@ -140,7 +140,7 @@ Models and `feature_columns.json` are saved to `joblib/`. They are not committed
 ### 7. Run the API
 
 ```bash
-uvicorn src .apimain: app --reload
+uvicorn src.api.main:app --reload
 ```
 
 - Health check: http://127.0.0.1:8000/health
@@ -176,7 +176,7 @@ The DAG `churn_etl_pipeline` runs `run_pipeline()` daily (`catchup=False`).
    ```
    On Windows PowerShell: `docker logs churn_airflow 2>&1 | Select-String "password"`.
 3. Open http://localhost:8080 and sign in as `admin`.
-4. Unpause the DAG and trigger it from the UI or:
+4. Un-pause the DAG and trigger it, from the UI or:
    ```bash
    docker exec churn_airflow airflow dags unpause churn_etl_pipeline
    docker exec churn_airflow airflow dags trigger churn_etl_pipeline
@@ -203,7 +203,7 @@ Python · pandas · PyArrow / Parquet · DuckDB · Google BigQuery · scikit-lea
 
 ## Possible next steps
 
-- Hyperparameter tuning for XGBoost (for example with Optuna)
+- Hyper-parameter tuning for XGBoost (for example with Optuna)
 - Unit tests for the transform and validate steps
 - Write pipeline logs and validation reports to files
 - Pass BigQuery credentials to containers through secrets
